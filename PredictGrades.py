@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-#import numpy as np
+import numpy as np
 import json 
 from random import random
 
@@ -12,6 +12,9 @@ class PredictGrades:
       weights.append(random())
     
     return weights
+
+  def sigmoid(x)
+    return 1 / (1 + np.exp(-x))
 
   trainingData = [] 
   weight = [] 
@@ -30,5 +33,28 @@ class PredictGrades:
   for i in range(0, layerNodes):
     weight.append(getWeights(1))
 
+  nodeResults = []
+  for j in range(0, layerNodes):
+    w = np.matrix(weight[j])
+    f = np.matrix(
+      trainingData[j]["timeStudied"], 
+      trainingData[j]["timeSlept"], 
+      trainingData[j]["classLevel"]
+    )
+    result = w * f
+    finValue = sigmoid(result)      
+    nodeResults.append(finValue)
+
+  if layers > 1:
+  for i in range(0, layers):
+    w = np.matrix(weight[j])
+    f = np.matrix(
+      trainingData[j]["timeStudied"], 
+      trainingData[j]["timeSlept"], 
+      trainingData[j]["classLevel"]
+    )
+    result = w * f
+    finValue = sigmoid(result)      
+    nodeResults.append(finValue)
 
   print(weight)
