@@ -4,21 +4,37 @@ import json
 from Model import Model 
 
 class PredictGrades:
+  data = [] 
+  trainResults = []
+  testResults = []
   trainingData = [] 
-  finTrainingData = [] 
+  testingData = [] 
+
   model = Model()
   model.init(3, 1, 1, 4)
 
   # parse json training data
   for line in open("trainingData.json", "r"):
-    trainingData.append(json.loads(line))
+    data.append(json.loads(line))
 
-  for t in range(0, len(trainingData)):
+  for i in range(0, len(data) - 4):
     train = [
-      [trainingData[t]["timeStudied"]],
-      [trainingData[t]["timeSlept"]],
-      [trainingData[t]["classLevel"]]
+      data[i]["timeStudied"],
+      data[i]["timeSlept"],
+      data[i]["classLevel"]
     ]
+
+    trainResults.append(data[i]["grade"])
+    trainingData.append(train)
     
-    finTrainingData.append(train)
-  print(str(finTrainingData))
+  for i in range(len(data) - 4, len(data)):
+    train = [
+      data[i]["timeStudied"],
+      data[i]["timeSlept"],
+      data[i]["classLevel"]
+    ]
+
+    testResults.append(data[i]["grade"])
+    trainingData.append(train)
+
+  model.trainModel(trainingData, testingData, trainResults, testResults)
