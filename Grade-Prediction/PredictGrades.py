@@ -41,11 +41,11 @@ class PredictGrades:
   
   while True:
     print("How long did you study: ")
-    studied = int(input())
+    studied = int(input()) * 0.01
     print("How long did you sleep: ")
-    slept = int(input())
+    slept = int(input()) * 0.1
     print("Class level: ")
-    classLevel = int(input())
+    classLevel = int(input()) * 0.001
      
     inputs = [studied, slept, classLevel]
     grade = model.getResult(inputs)

@@ -134,10 +134,10 @@ class Model:
     yhat = []
     loss = [] 
     testLoss = 1
-    gamma = 0.001
+    gamma = 1 
 
-    while abs(testLoss) > 0.1:
-      totalLoss = [] 
+    while abs(testLoss) > 0.001:
+      totalLoss = []
       
       # initialize total loss array
       for i in range(0, len(self.weights)):
@@ -171,10 +171,6 @@ class Model:
       for i in range(0, len(totalLoss)):
         for j in range(0, len(totalLoss[i])):
           self.weights[i][j] -= gamma * totalLoss[i][j]
-
-      for j in range(0, len(self.weights)):
-        print(self.weights[j])
-      print(" ")
 
       testLoss = 0
       for i in range(0, len(testingData)):
