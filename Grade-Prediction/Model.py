@@ -52,13 +52,12 @@ class Model:
     if self.layers >= 1:
       for i in range(0, self.layerNodes):
         initWeight.append(self.getRanWeights(self.inputNum))
-      for i in range(0, self.layers):
+      for i in range(1, self.layers):
         for j in range(0, self.layerNodes):
           initWeight.append(self.getRanWeights(self.layerNodes))
-      for i in range(1, self.layerNodes):
+      for i in range(0, self.layerNodes):
         initWeight.append(self.getRanWeights(self.outputNum))
     self.weights = initWeight
-    print(self.weights)
 
   def getResult(self, inputs):
     nodeResults = []
@@ -108,43 +107,76 @@ class Model:
    
     return finalGrade
 
-  def computeNewWeights(loss, layerWeights, dependentWeights, inputs, results):
+  def computeNewWeights(self, loss, layerWeights, dependentWeights, inputs, result):
+    gradients = []
+    inputProd = 1
+    for i in range(0, len(inputs)):
+      inputProd *= inputs[i]
+
     for i in range(0, len(layerWeights)):
-     parDer = 1
-     gamma = 0.001
-     if(len(dependentWeights) > 0):
-       for j in range(0, len(dependentWeights)): 
-         weightSum = 0
-         for k in range(0, len(dependentWeights[j])):
-           weightSum += dependentWeights[j][k]
+      parDer = 1
+      if(len(dependentWeights) > 0):
+        for j in range(0, len(dependentWeights)): 
+          weightSum = 0
+          if type(dependentWeights[j]) is float:
+            weightSum += dependentWeights[j]
+          else:
+            for k in range(0, len(dependentWeights[j])):
+              weightSum += dependentWeights[j][k]
          
-         parDer = parDer * self.sigmoidPrime(weightSum * results[j])
+          parDer = parDer * self.sigmoidPrime(weightSum * result)
 
-     grad = loss * parDer * inputs
-     gradients.append(layerWeights[i] - (gamma *grad))
-    
+      gradients.append(loss * parDer * inputProd)
+   
+    return gradients
 
-  def trainModel(self, trainingData, testingData, results):
+  def trainModel(self, trainingData, testingData, trainResults, testResults):
     yhat = []
-    loss = 0
+    loss = [] 
     testLoss = 1
-    while testLoss > 0.00001:
+    gamma = 0.001
+
+    while abs(testLoss) > 0.1:
+      totalLoss = [] 
+      
+      # initialize total loss array
+      for i in range(0, len(self.weights)):
+        weightLen = []
+        for j in range(0, len(self.weights[i])):
+          weightLen.append(0)
+        totalLoss.append(weightLen)
+          
+      # get the sum of the loss with respect to each weight
       for i in range(0, len(trainingData)):
         yhat.append(self.getResult(trainingData[i]))
-        loss.append(yhat[i] - results[i])
+        loss.append(yhat[i] - trainResults[i])
     
         gradients = []
-        for j in range(0, layers):
-          for k in range(0, layerNodes):
-            gradients.append(self.computeNewWeights(weights[j]), [], trainingData[j], resultsPerNode[j])
+        weightNum = 0
+        for j in range(0, self.layers):
+          weightNum += 1
+          for k in range(0, self.layerNodes):
+            gradients.append(self.computeNewWeights(loss[i], self.weights[j], [], trainingData[i], trainResults[i]))
       
         for j in range(0, 4):
-          gradients.append(self.computeNewWeights(weights[j]), [], trainingData[j], resultsPerNode[j])
+          gradients.append(self.computeNewWeights(loss[i], self.weights[weightNum + j], self.weights[j], trainingData[i], trainResults[i]))
+
+        # add loss to total loss
+        for i in range(0, len(totalLoss)):
+          for j in range(0, len(totalLoss[i])):
+            totalLoss[i][j] += gradients[i][j] 
+      
+
+      # update the weights 
+      for i in range(0, len(totalLoss)):
+        for j in range(0, len(totalLoss[i])):
+          self.weights[i][j] -= gamma * totalLoss[i][j]
+
+      for j in range(0, len(self.weights)):
+        print(self.weights[j])
+      print(" ")
 
       testLoss = 0
       for i in range(0, len(testingData)):
-        testEstimate = self.getResult(testingData[i]))
-        loss += testEstimate - results[len(trainingData) + i - 1])
-
-      self.resultsPerNode = []
-      print(gradients)
+        testEstimate = self.getResult(testingData[i])
+        testLoss += testEstimate - testResults[i]

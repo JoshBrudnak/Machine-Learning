@@ -35,6 +35,19 @@ class PredictGrades:
     ]
 
     testResults.append(data[i]["grade"])
-    trainingData.append(train)
+    testingData.append(train)
 
   model.trainModel(trainingData, testingData, trainResults, testResults)
+  
+  while True:
+    print("How long did you study: ")
+    studied = int(input())
+    print("How long did you sleep: ")
+    slept = int(input())
+    print("Class level: ")
+    classLevel = int(input())
+     
+    inputs = [studied, slept, classLevel]
+    grade = model.getResult(inputs)
+    grade = grade * 100
+    print("Your grade will be: %.2f" % (grade))
