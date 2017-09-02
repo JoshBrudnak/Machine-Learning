@@ -30,23 +30,6 @@ class Model:
   def sigmoid(self, x):
     return 1 / (1 + np.exp(-x))
 
-  def sigmoidPrime(self, x):
-    exp = math.e ** x
-    return exp / (exp + 1)**2
-
-  def getLoss(self, data, answer):
-    loss = [] 
-    for i in range(0, len(data)):
-      error = (answer[i] - data[i]) ** 2
-      loss.append(error / 2)
-    
-    return loss 
-
-  def getLossPrime(self, yhat, answer):
-    loss = answer - yhat
-    
-    return loss 
-
   def setInitialWeights(self):
     initWeight = []
     if self.layers >= 1:
@@ -106,73 +89,3 @@ class Model:
     self.resultsPerNode.append(nodeResults)
    
     return finalGrade
-
-  def computeNewWeights(self, loss, layerWeights, dependentWeights, inputs, result):
-    gradients = []
-    inputProd = 1
-    for i in range(0, len(inputs)):
-      inputProd *= inputs[i]
-
-    for i in range(0, len(layerWeights)):
-      parDer = 1
-      if(len(dependentWeights) > 0):
-        for j in range(0, len(dependentWeights)): 
-          weightSum = 0
-          if type(dependentWeights[j]) is float:
-            weightSum += dependentWeights[j]
-          else:
-            for k in range(0, len(dependentWeights[j])):
-              weightSum += dependentWeights[j][k]
-         
-          parDer = parDer * self.sigmoidPrime(weightSum * result)
-
-      gradients.append(loss * parDer * inputProd)
-   
-    return gradients
-
-  def trainModel(self, trainingData, testingData, trainResults, testResults):
-    yhat = []
-    loss = [] 
-    testLoss = 1
-    gamma = 1 
-
-    while abs(testLoss) > 0.001:
-      totalLoss = []
-      
-      # initialize total loss array
-      for i in range(0, len(self.weights)):
-        weightLen = []
-        for j in range(0, len(self.weights[i])):
-          weightLen.append(0)
-        totalLoss.append(weightLen)
-          
-      # get the sum of the loss with respect to each weight
-      for i in range(0, len(trainingData)):
-        yhat.append(self.getResult(trainingData[i]))
-        loss.append(yhat[i] - trainResults[i])
-    
-        gradients = []
-        weightNum = 0
-        for j in range(0, self.layers):
-          weightNum += 1
-          for k in range(0, self.layerNodes):
-            gradients.append(self.computeNewWeights(loss[i], self.weights[j], [], trainingData[i], trainResults[i]))
-      
-        for j in range(0, 4):
-          gradients.append(self.computeNewWeights(loss[i], self.weights[weightNum + j], self.weights[j], trainingData[i], trainResults[i]))
-
-        # add loss to total loss
-        for i in range(0, len(totalLoss)):
-          for j in range(0, len(totalLoss[i])):
-            totalLoss[i][j] += gradients[i][j] 
-      
-
-      # update the weights 
-      for i in range(0, len(totalLoss)):
-        for j in range(0, len(totalLoss[i])):
-          self.weights[i][j] -= gamma * totalLoss[i][j]
-
-      testLoss = 0
-      for i in range(0, len(testingData)):
-        testEstimate = self.getResult(testingData[i])
-        testLoss += testEstimate - testResults[i]
