@@ -42,6 +42,22 @@ class Model:
         initWeight.append(self.getRanWeights(self.outputNum))
     self.weights = initWeight
 
+  def convertNewWeights(self, values):
+    newWeights = []
+    for i in range(0, 4):
+      nodeWeights = []
+      for j in range(0, 3):
+        nodeWeights.append(values[i + j])
+      newWeights.append(nodeWeights)
+      
+    nodeWeights = []
+    for i in range(len(values) - 4, len(values)):
+      nodeWeights.append(values[i])
+      newWeights.append(nodeWeights)
+    
+    self.weights = newWeights
+    
+
   def getResult(self, inputs):
     nodeResults = []
 

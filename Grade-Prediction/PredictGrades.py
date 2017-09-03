@@ -3,6 +3,7 @@
 import json 
 from Model import Model 
 from BackPropagation import BackPropagation
+from GeneticAlgorithym import GeneticAlgorithym 
 
 class PredictGrades:
   data = [] 
@@ -14,6 +15,7 @@ class PredictGrades:
   model = Model()
   model.init(3, 1, 1, 4)
   bpTraining = BackPropagation()
+  genAlTraining = GeneticAlgorithym()
 
   # parse json training data
   for line in open("trainingData.json", "r"):
@@ -39,7 +41,8 @@ class PredictGrades:
     testResults.append(data[i]["grade"])
     testingData.append(train)
 
-  model.weights = bpTraining.trainModel(model, trainingData, testingData, trainResults, testResults)
+  #model.weights = bpTraining.trainModel(model, trainingData, testingData, trainResults, testResults)
+  genAlTraining.trainModel(model, trainingData, testingData, trainResults, testResults)
   
   while True:
     print("How long did you study: ")
