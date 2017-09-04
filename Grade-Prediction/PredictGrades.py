@@ -42,7 +42,7 @@ class PredictGrades:
     testingData.append(train)
 
   #model.weights = bpTraining.trainModel(model, trainingData, testingData, trainResults, testResults)
-  genAlTraining.trainModel(model, trainingData, testingData, trainResults, testResults)
+  model.weights = genAlTraining.trainModel(model, trainingData, trainResults)
   
   while True:
     print("How long did you study: ")

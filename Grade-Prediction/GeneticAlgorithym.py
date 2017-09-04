@@ -11,38 +11,43 @@ class GeneticAlgorithym:
     
     return error 
   
-  def sigmoidPrime(self, x):
-    exp = math.e ** x
-    return exp / (exp + 1)**2
-  
   def getGenome(self, weights):
     finWeight = []
     for i in range(0, len(weights)):
       for j in range(0, len(weights[i])):
-        finWeight.append(weights[i][j])
+        finWeight.append(weights[i][j] + (random()))
 
     return finWeight
 
-  #def computeNewWeights(self, loss, layerWeights, dependentWeights, inputs, result):
-
-  def trainModel(self, model, trainingData, testingData, trainResults, testResults):
-    populationSize = 50
-    genome = self.getGenome(model.weights)
-    minError = 1
-    population = []
-    for i in range(0, populationSize): 
-      population.append(genome)
-   
-    while minError > 0.001:
-      sign = 1.0
-      newPopulation = []
-      for i in range(0, len(population)): 
+  def mutateGenomes(self, population):
+    mutPopulation = []
+    gamma = 0.01 
+    for i in range(0, len(population)): 
+      mut = int(random() * 100)
+      if mut == 75:
         mutGenome = []
         for j in range(0, len(population[i])): 
-          mutGenome.append(population[i][j] + ((sign * random()) - 0.1))
-          sign *= 1.0
-        newPopulation.append(mutGenome)
-      population = newPopulation
+          mutGenome.append(population[i][j] - (random() * 0.1))
+          gamma *= -1.0
+      
+        mutPopulation.append(mutGenome)
+      else:
+        mutPopulation.append(population[i])
+
+    return mutPopulation
+
+  def trainModel(self, model, trainingData, trainResults):
+    populationSize = 50
+    continueSize = 10
+    minError = 1
+    minGenome = []
+    population = []
+
+    for i in range(0, populationSize):
+      population.append(self.getGenome(model.weights))
+
+    while minError > 0.01:
+      population = self.mutateGenomes(population) 
 
       populationLoss = []
       for i in range(0, len(population)): 
@@ -55,7 +60,7 @@ class GeneticAlgorithym:
  
       nextGen = []
       nextGenIndex = []
-      for i in range(0, 10):
+      for i in range(0, continueSize):
         index = 0
         lowest = 1.0
         for j in range(0, len(populationLoss)): 
@@ -74,26 +79,18 @@ class GeneticAlgorithym:
         index = 0
 
       minError = populationLoss[nextGenIndex[0]] 
+      minGenome = nextGen[0]
       print(minError)
-      population = []
-      for i in range(0, 5):
-        nextAverage = []
-        for j in range(0, len(nextGen[i])):
-          nextAverage.append((nextGen[i][j] + nextGen[9 - i][j]) / 2)
-        population.append(nextAverage)
-     
-      for i in range(0, 10):
-        alt = []
-        for j in range(0, len(nextGen[i])):
-          if(i % 2 == 0):
-            alt.append(nextGen[i][j])
-          else:
-            alt.append(nextGen[9 - i][j])
-
-      for i in range(0, populationSize - 20):
-        ran = []
-        for j in range(0, len(nextGen[0])):
-          ran.append(random())
-        population.append(ran)
-
-      #print(nextGen)
+      population = nextGen 
+      for k in range(0, 4):
+        for i in range(0, continueSize):
+          nextGenome = []
+          bits = []
+          for j in range(0, continueSize):
+            ran = random()
+            if ran >= 0.5:
+              nextGenome.append(nextGen[i][j])
+            else:
+              nextGenome.append(nextGen[len(nextGen) - 1 - i][j])
+          population.append(nextGenome)
+    return model.convertNewWeights(minGenome)
