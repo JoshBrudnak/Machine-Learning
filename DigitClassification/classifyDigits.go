@@ -6,9 +6,6 @@ func main() {
   trainingData := ReadCsv("mnist_train.csv")
   testingData := ReadCsv("mnist_test.csv")
 
-  fmt.Println(trainingData[0].label)
-  fmt.Println(trainingData[0].image)
-  fmt.Println(testingData[0].label)
-  fmt.Println(testingData[0].image)
-  fmt.Println(len(trainingData))
+  initializeModel(2, 1, 2, 10, 2, 10)
+  trainModel(trainingData, testingData)
 }
